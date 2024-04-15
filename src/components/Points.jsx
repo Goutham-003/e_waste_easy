@@ -1,6 +1,10 @@
 import { useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { useEffect } from "react";
+import { getToken } from "./Cookies"; // Import function to retrieve token from cookies
+import AuthNavbar from "./AuthNavbar"; // Import authenticated navbar
+import { getUserName } from "./Cookies";
 
 import img1 from "../assets/images/rewards/1.jpg";
 import img2 from "../assets/images/rewards/2.jpg";
@@ -17,41 +21,62 @@ import img12 from "../assets/images/rewards/12.jpeg";
 import upload_image from "../assets/images/Upload_image.png";
 
 const Edumpers = () => {
-  const [size, setSize] = useState("Small Electronics");
-  const [item, setItem] = useState("Smartphone");
-  const [weight, setWeight] = useState(0);
+  // const [size, setSize] = useState("Small Electronics");
+  // const [item, setItem] = useState("Smartphone");
+  // const [weight, setWeight] = useState(0);
   const [points, setPoints] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const calculatePoints = () => {
-    if (size === "Small Electronics") {
-      setPoints(1 * weight);
-    } else if (size === "Medium Electronics") {
-      setPoints(2 * weight);
-    } else if (size === "Large Electronics") {
-      setPoints(3 * weight);
+  useEffect(() => {
+    // Check if token exists in cookies
+    const token = getToken();
+    fetchRewards();
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  const fetchRewards = async () => {
+    try {
+      const userName = await getUserName();
+      const user = userName.token;
+      const response = await fetch(
+        `http://localhost:5000/get-rewards/${user}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Rewards have been fetched");
+        setPoints(data);
+      } else {
+        console.error("Failed to fetch all pickups");
+      }
+    } catch (error) {
+      console.error("Error fetching all pickups:", error);
     }
   };
 
   return (
     <>
-      <Navbar />
+      {isAuthenticated ? <AuthNavbar /> : <Navbar />}
 
       <section className="text-gray-600 body-font relative">
-        <div className="container px-5 py-10 mx-auto">
-          <div className="flex flex-col text-center w-full mb-12">
-            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
+        <div className="container px-5 pt-10 mx-auto">
+          <div className="flex flex-col text-center w-full">
+            <h1 className="sm:text-3xl text-2xl font-medium title-font text-gray-900">
               Redeem
             </h1>
             <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
-              Choose the type of your disposal to check the points.
+              Choose the items for your points.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="text-gray-600 flex justify-center w-auto mb-5 body-font">
+      <section className="text-gray-600 flex justify-center w-auto body-font">
         <div className="flex flex-row w-1/3 justify-around items-start">
-          <div className="mr-20">
+          {/* <div className="mr-20">
             <div className="flex justify-start flex-col items-start">
               <span className="mr-3">Electronics Size</span>
               <div className="relative">
@@ -135,7 +160,7 @@ const Edumpers = () => {
                 Submit
               </a>
             </div>
-          </div>
+          </div> */}
           {/* <div className="flex justify-center items-center w-64 mr-20 mx-auto">
             <div className="flex flex-wrap">
               <div className="relative">
@@ -157,7 +182,7 @@ const Edumpers = () => {
               </div>
             </div>
           </div> */}
-          <div className="flex justify-center items-center w-64 mx-auto">
+          {/* <div className="flex justify-center items-center w-64 mx-auto">
             <div className="flex flex-wrap">
               <div className="relative">
                 <label
@@ -191,7 +216,7 @@ const Edumpers = () => {
                 </a>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="w-auto">
             <div className="flex w-60 flex-col rounded-lg border border-gray-100 px-4 py-4 text-center">
@@ -223,57 +248,7 @@ const Edumpers = () => {
                     Certificate
                   </h2>
                   <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    1 Points
-                  </h3>
-                </div>
-                <a
-                  href="/"
-                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
-                >
-                  Reedem
-                </a>
-              </div>
-            </div>
-            <div className="lg:w-1/6 md:w-1/2 p-4 w-full">
-              <a className="block relative h-48 rounded overflow-hidden">
-                <img
-                  alt="ecommerce"
-                  className="object-cover object-center w-full h-full block"
-                  src={img2}
-                />
-              </a>
-              <div className="mt-4">
-                <div className="flex flex-row items-center justify-between">
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    T-Shirt
-                  </h2>
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    3 Points
-                  </h3>
-                </div>
-                <a
-                  href="/"
-                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
-                >
-                  Reedem
-                </a>
-              </div>
-            </div>
-            <div className="lg:w-1/6 md:w-1/2 p-4 w-full">
-              <a className="block relative h-48 rounded overflow-hidden">
-                <img
-                  alt="ecommerce"
-                  className="object-cover object-center w-full h-full block"
-                  src={img3}
-                />
-              </a>
-              <div className="mt-4">
-                <div className="flex flex-row items-center justify-between">
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    T-Shirt
-                  </h2>
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    3 Points
+                    10 Points
                   </h3>
                 </div>
                 <a
@@ -298,7 +273,82 @@ const Edumpers = () => {
                     Poster
                   </h2>
                   <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    4 Points
+                    30 Points
+                  </h3>
+                </div>
+                <a
+                  href="/"
+                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
+                >
+                  Reedem
+                </a>
+              </div>
+            </div>
+            <div className="lg:w-1/6 md:w-1/2 p-4 w-full">
+              <a className="block relative h-48 rounded overflow-hidden">
+                <img
+                  alt="ecommerce"
+                  className="object-cover object-center w-full h-full block"
+                  src={img2}
+                />
+              </a>
+              <div className="mt-4">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-gray-900 title-font text-lg font-medium">
+                    T-Shirt
+                  </h2>
+                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
+                    50 Points
+                  </h3>
+                </div>
+                <a
+                  href="/"
+                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
+                >
+                  Reedem
+                </a>
+              </div>
+            </div>
+            <div className="lg:w-1/6 md:w-1/2 p-4 w-full">
+              <a className="block relative h-48 rounded overflow-hidden">
+                <img
+                  alt="ecommerce"
+                  className="object-cover object-center w-full h-full block"
+                  src={img3}
+                />
+              </a>
+              <div className="mt-4">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-gray-900 title-font text-lg font-medium">
+                    T-Shirt
+                  </h2>
+                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
+                    60 Points
+                  </h3>
+                </div>
+                <a
+                  href="/"
+                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
+                >
+                  Reedem
+                </a>
+              </div>
+            </div>
+            <div className="lg:w-1/6 md:w-1/2 p-4 w-full">
+              <a className="block relative h-48 rounded overflow-hidden">
+                <img
+                  alt="ecommerce"
+                  className="object-cover object-center w-full h-full block"
+                  src={img9}
+                />
+              </a>
+              <div className="mt-4">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-gray-900 title-font text-lg font-medium">
+                    T-Shirt
+                  </h2>
+                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
+                    70 Points
                   </h3>
                 </div>
                 <a
@@ -323,132 +373,7 @@ const Edumpers = () => {
                     Metal Badge
                   </h2>
                   <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    5 Points
-                  </h3>
-                </div>
-                <a
-                  href="/"
-                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
-                >
-                  Reedem
-                </a>
-              </div>
-            </div>
-            <div className="lg:w-1/6 md:w-1/2 p-4 w-full">
-              <a className="block relative h-48 rounded overflow-hidden">
-                <img
-                  alt="ecommerce"
-                  className="object-cover object-center w-full h-full block"
-                  src={img6}
-                />
-              </a>
-              <div className="mt-4">
-                <div className="flex flex-row items-center justify-between">
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    Diary
-                  </h2>
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    6 Points
-                  </h3>
-                </div>
-                <a
-                  href="/"
-                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
-                >
-                  Reedem
-                </a>
-              </div>
-            </div>
-            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
-              <a className="block relative h-48 rounded overflow-hidden">
-                <img
-                  alt="ecommerce"
-                  className="object-cover object-center w-full h-full block"
-                  src={img7}
-                />
-              </a>
-              <div className="mt-4">
-                <div className="flex flex-row items-center justify-between">
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    Cap
-                  </h2>
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    4 Points
-                  </h3>
-                </div>
-                <a
-                  href="/"
-                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
-                >
-                  Reedem
-                </a>
-              </div>
-            </div>
-            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
-              <a className="block relative h-48 rounded overflow-hidden">
-                <img
-                  alt="ecommerce"
-                  className="object-cover object-center w-full h-full block"
-                  src={img8}
-                />
-              </a>
-              <div className="mt-4">
-                <div className="flex flex-row items-center justify-between">
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    Water Bottle
-                  </h2>
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    9 Points
-                  </h3>
-                </div>
-                <a
-                  href="/"
-                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
-                >
-                  Reedem
-                </a>
-              </div>
-            </div>
-            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
-              <a className="block relative h-48 rounded overflow-hidden">
-                <img
-                  alt="ecommerce"
-                  className="object-cover object-center w-full h-full block"
-                  src={img9}
-                />
-              </a>
-              <div className="mt-4">
-                <div className="flex flex-row items-center justify-between">
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    T-Shirt
-                  </h2>
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    8 Points
-                  </h3>
-                </div>
-                <a
-                  href="/"
-                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
-                >
-                  Reedem
-                </a>
-              </div>
-            </div>
-            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
-              <a className="block relative h-48 rounded overflow-hidden">
-                <img
-                  alt="ecommerce"
-                  className="object-cover object-center w-full h-full block"
-                  src={img10}
-                />
-              </a>
-              <div className="mt-4">
-                <div className="flex flex-row items-center justify-between">
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    Hoodie
-                  </h2>
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    12 Points
+                    100 Points
                   </h3>
                 </div>
                 <a
@@ -473,7 +398,7 @@ const Edumpers = () => {
                     Cup
                   </h2>
                   <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    10 Points
+                    120 Points
                   </h3>
                 </div>
                 <a
@@ -489,6 +414,108 @@ const Edumpers = () => {
                 <img
                   alt="ecommerce"
                   className="object-cover object-center w-full h-full block"
+                  src={img6}
+                />
+              </a>
+              <div className="mt-4">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-gray-900 title-font text-lg font-medium">
+                    Diary
+                  </h2>
+                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
+                    150 Points
+                  </h3>
+                </div>
+                <a
+                  href="/"
+                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
+                >
+                  Reedem
+                </a>
+              </div>
+            </div>
+            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
+              <a className="block relative h-48 rounded overflow-hidden">
+                <img
+                  alt="ecommerce"
+                  className="object-cover object-center w-full h-full block"
+                  src={img7}
+                />
+              </a>
+              <div className="mt-4">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-gray-900 title-font text-lg font-medium">
+                    Cap
+                  </h2>
+                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
+                    160 Points
+                  </h3>
+                </div>
+                <a
+                  href="/"
+                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
+                >
+                  Reedem
+                </a>
+              </div>
+            </div>
+            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
+              <a className="block relative h-48 rounded overflow-hidden">
+                <img
+                  alt="ecommerce"
+                  className="object-cover object-center w-full h-full block"
+                  src={img8}
+                />
+              </a>
+              <div className="mt-4">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-gray-900 title-font text-lg font-medium">
+                    Water Bottle
+                  </h2>
+                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
+                    200 Points
+                  </h3>
+                </div>
+                <a
+                  href="/"
+                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
+                >
+                  Reedem
+                </a>
+              </div>
+            </div>
+            
+            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
+              <a className="block relative h-48 rounded overflow-hidden">
+                <img
+                  alt="ecommerce"
+                  className="object-cover object-center w-full h-full block"
+                  src={img10}
+                />
+              </a>
+              <div className="mt-4">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-gray-900 title-font text-lg font-medium">
+                    Hoodie
+                  </h2>
+                  <h3 className="text-gray-500 text-xs tracking-widest title-font">
+                    250 Points
+                  </h3>
+                </div>
+                <a
+                  href="/"
+                  className="mt-2 py-2 flex rounded-lg justify-center bg-green-500 font-semibold text-white hover:bg-green-600"
+                >
+                  Reedem
+                </a>
+              </div>
+            </div>
+            
+            <div className="lg:w-1/6 md:w-1/2 p-4 w-full mt-8">
+              <a className="block relative h-48 rounded overflow-hidden">
+                <img
+                  alt="ecommerce"
+                  className="object-cover object-center w-full h-full block"
                   src={img12}
                 />
               </a>
@@ -498,7 +525,7 @@ const Edumpers = () => {
                     Dustbin
                   </h2>
                   <h3 className="text-gray-500 text-xs tracking-widest title-font">
-                    15 Points
+                    1000 Points
                   </h3>
                 </div>
                 <a

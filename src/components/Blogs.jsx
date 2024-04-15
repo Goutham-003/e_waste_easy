@@ -3,12 +3,25 @@ import Footer from "./Footer";
 import blog1 from "../assets/images/blog1.jpg"
 import blog2 from "../assets/images/blog2.jpg"
 import blog3 from "../assets/images/test4.jpg"
+import { useEffect, useState } from "react";
+import { getToken } from "./Cookies"; // Import function to retrieve token from cookies
+import AuthNavbar from "./AuthNavbar"; // Import authenticated navbar
 
 const Blogs = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    useEffect(() => {
+        // Check if token exists in cookies
+        const token = getToken();
+        if (token) {
+        setIsAuthenticated(true);
+        } else {
+        setIsAuthenticated(false);
+        }
+    }, []);
     return (
         <>
-            <Navbar />
+            {isAuthenticated ? <AuthNavbar /> : <Navbar />}
 
             <section className="bg-white">
                 <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16">

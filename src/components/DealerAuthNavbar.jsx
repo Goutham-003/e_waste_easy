@@ -1,17 +1,33 @@
+import React from "react";
 import logo from "../logo.svg";
 import profilePhoto from "../assets/images/profile.png";
 import { useState } from "react";
+import { destroyCookie } from "nookies";
+
+const handleLogout = () => {
+  // Delete the authData cookie
+  destroyCookie(null, "authData", { path: "/" });
+
+  // Redirect to login page
+  window.location.href = "http://localhost:3000";
+};
 
 const Navbar = () => {
-  const [colorChange, setColorchange] = useState("");
+  const [colorChange, setColorChange] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const changeNavbarColor = () => {
     if (window.scrollY >= 1) {
-      setColorchange("bg-white shadow-md");
+      setColorChange("bg-white shadow-md");
     } else {
-      setColorchange("");
+      setColorChange("");
     }
   };
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
   window.addEventListener("scroll", changeNavbarColor);
 
   return (
@@ -32,33 +48,19 @@ const Navbar = () => {
           <a href="/about" className="mr-5 hover:text-green-600">
             About
           </a>
-          <a href="/dispose" className="mr-5 hover:text-green-600">
-            Dispose
-          </a>
           <a href="/blogs" className="mr-5 hover:text-green-600">
             Blogs
           </a>
-          <a href="/points" className="mr-5 hover:text-green-600">
-            Rewards
-          </a>
         </nav>
-        <a
-          href="/usersignup"
-          className="inline-flex items-center bg-gray-100 border-0 py-2 px-5 focus:outline-none hover:bg-green-300 rounded text-base mt-4 md:mt-0 mr-4"
-        >
-          Sign-up
-        </a>
-        <a
-          href="/login"
-          className="inline-flex items-center bg-gray-100 border-0 py-2 px-5 focus:outline-none hover:bg-green-300 rounded text-base mt-4 md:mt-0 mr-8"
-        >
-          Login
-        </a>
-        <img
-          className="w-10 h-10 rounded-full"
-          src={profilePhoto}
-          alt="Rounded avatar"
-        />
+        <div className="relative">
+          <a
+            onClick={handleLogout}
+            href="/"
+            className="inline-flex items-center bg-gray-100 border-0 py-2 px-5 focus:outline-none hover:bg-red-400 rounded text-base mt-4 md:mt-0 mr-8"
+          >
+            Logout
+          </a>
+        </div>
       </div>
     </header>
   );

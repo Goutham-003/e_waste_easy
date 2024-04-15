@@ -4,10 +4,25 @@ import Footer from "./Footer";
 import about1 from "../assets/images/hero2.png";
 import about2 from "../assets/images/about4.jpg";
 
+import { getToken } from "./Cookies"; // Import function to retrieve token from cookies
+import AuthNavbar from "./AuthNavbar"; // Import authenticated navbar
+import { useEffect, useState } from "react";
+
 const About = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if token exists in cookies
+    const token = getToken();
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
   return (
     <>
-      <Navbar />
+      {isAuthenticated ? <AuthNavbar /> : <Navbar />}
 
       <section className="container px-20 py-10 mx-auto flex flex-wrap overflow-hidden">
         <div className="flex flex-wrap items-center justify-between -mx-4">
@@ -247,7 +262,8 @@ const About = () => {
                     STEP 3
                   </h2>
                   <p className="leading-relaxed">
-                    Dispose E-Waste responsibly, By using Pick-up and Drop-off features provided in the website.
+                    Dispose E-Waste responsibly, By using Pick-up and Drop-off
+                    features provided in the website.
                   </p>
                 </div>
               </div>
@@ -298,8 +314,8 @@ const About = () => {
                     FINISH
                   </h2>
                   <p className="leading-relaxed">
-                    Redeem Points for Valuable Items and get your certificate to
-                    contribute to a sustainable environment{" "}
+                    Redeem Points for Valuable Items and contribute to a
+                    sustainable environment{" "}
                   </p>
                 </div>
               </div>

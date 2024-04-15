@@ -1,17 +1,28 @@
+import React from "react";
 import logo from "../logo.svg";
 import profilePhoto from "../assets/images/profile.png";
 import { useState } from "react";
+import { destroyCookie } from "nookies";
+
+const handleLogout = () => {
+  // Delete the authData cookie
+  destroyCookie(null, "authData", { path: "/" });
+
+  // Redirect to login page
+  window.location.href = "http://localhost:3000";
+};
 
 const Navbar = () => {
-  const [colorChange, setColorchange] = useState("");
+  const [colorChange, setColorChange] = useState("");
 
   const changeNavbarColor = () => {
     if (window.scrollY >= 1) {
-      setColorchange("bg-white shadow-md");
+      setColorChange("bg-white shadow-md");
     } else {
-      setColorchange("");
+      setColorChange("");
     }
   };
+
   window.addEventListener("scroll", changeNavbarColor);
 
   return (
@@ -41,24 +52,35 @@ const Navbar = () => {
           <a href="/points" className="mr-5 hover:text-green-600">
             Rewards
           </a>
+          <a href="/profile" className="mr-5 hover:text-green-600">
+            Profile
+          </a>
         </nav>
-        <a
-          href="/usersignup"
-          className="inline-flex items-center bg-gray-100 border-0 py-2 px-5 focus:outline-none hover:bg-green-300 rounded text-base mt-4 md:mt-0 mr-4"
-        >
-          Sign-up
-        </a>
-        <a
-          href="/login"
-          className="inline-flex items-center bg-gray-100 border-0 py-2 px-5 focus:outline-none hover:bg-green-300 rounded text-base mt-4 md:mt-0 mr-8"
-        >
-          Login
-        </a>
-        <img
-          className="w-10 h-10 rounded-full"
-          src={profilePhoto}
-          alt="Rounded avatar"
-        />
+        <div className="relative">
+          {/* <img
+            className="w-10 h-10 rounded-full cursor-pointer"
+            src={profilePhoto}
+            alt="Rounded avatar"
+            onClick={toggleDropdown}
+          /> */}
+          <a
+            onClick={handleLogout}
+            href="/"
+            className="inline-flex items-center bg-gray-100 border-0 py-2 px-5 focus:outline-none hover:bg-red-400 rounded text-base mt-4 md:mt-0 mr-8"
+          >
+            Logout
+          </a>
+          {/* {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-36 bg-white rounded-md overflow-hidden shadow-md z-10">
+              <button
+                onClick={handleLogout}
+                className="block px-4 py-2 w-full text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          )} */}
+        </div>
       </div>
     </header>
   );

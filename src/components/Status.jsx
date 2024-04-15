@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import TrackingComponent from "./TrackingComponent";
 import Navbar from "./Navbar";
-import Hero from "./Hero";
-import Gallery from "./Gallery";
-import Contact from "./Contact";
-import Footer from "./Footer";
 import { getToken } from "./Cookies"; // Import function to retrieve token from cookies
 import AuthNavbar from "./AuthNavbar"; // Import authenticated navbar
+import { useEffect, useState } from "react";
 
-const Home = () => {
+export const Status = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -19,16 +17,13 @@ const Home = () => {
       setIsAuthenticated(false);
     }
   }, []);
-
   return (
     <>
       {isAuthenticated ? <AuthNavbar /> : <Navbar />}
-      <Hero />
-      <Gallery />
-      <Contact />
-      <Footer />
+
+      <div className="flex flex-col gap-10 h-screen items-center">
+        <TrackingComponent currentStepNumber={3} type="drop" />
+      </div>
     </>
   );
 };
-
-export default Home;
