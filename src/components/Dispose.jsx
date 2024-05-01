@@ -5,6 +5,9 @@ import upload_image from "../assets/images/Upload_image1.png";
 import location_image from "../assets/images/location.png";
 import AuthNavbar from "./AuthNavbar"; // Import authenticated navbar
 import { getToken, getUserName } from "./Cookies";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { AiOutlineDelete } from "react-icons/ai";
 
 const Dispose = () => {
   const [lat, setLat] = useState();
@@ -13,6 +16,12 @@ const Dispose = () => {
   const [mode, setMode] = useState("pickup");
   const [userName, setUserName] = useState("");
 
+  const showToastMessage = (message) => {
+    toast.success(message, { autoClose: 3000 });
+  };
+  const showErrorMessage = (message) => {
+    toast.error( message, { autoClose: 1600 });
+  };
   const [item, setItem] = useState("");
   const [quantity, setQuantity] = useState("");
   const [itemsList, setItemsList] = useState([]);
@@ -21,7 +30,7 @@ const Dispose = () => {
 
   function handle() {
     if (!isAuthenticated) {
-      alert("You have not logged in");
+      showErrorMessage("You have not logged in");
     } else {
       handleSubmit(); // Assuming handleSubmit() is defined elsewhere
     }
@@ -30,7 +39,7 @@ const Dispose = () => {
   const handleSubmit = async (e) => {
     // e.preventDefault();
     if (!isAuthenticated) {
-      alert("You have not logged in");
+      showErrorMessage("You have not logged in");
       window.location.href = "http://localhost:3000/dispose";
     }
     setUserName(getUserName);
@@ -40,6 +49,11 @@ const Dispose = () => {
     console.log("Inside handle Submit");
     const dealerUserName = "Green_Wave";
     const status = 1;
+    if (itemsList.length === 0) {
+      console.error("Items list is empty");
+      showErrorMessage("You haven't added E-Waste items");
+      return;
+    }
     if (mode === "pickup") {
       postData = {
         lat,
@@ -73,11 +87,13 @@ const Dispose = () => {
       );
       if (response.ok) {
         // Handle success
+        showToastMessage("Request Sent Successfully");
         console.log("Request submitted successfully");
         setItemsList([]);
       } else {
         // Handle error
         console.error("Failed to submit request");
+        showErrorMessage("Failed to submit request");
       }
     } catch (error) {
       console.error("Error submitting request:", error);
@@ -96,7 +112,13 @@ const Dispose = () => {
   }, [isAuthenticated]);
 
   const addItem = () => {
-    if (item && quantity) {
+    if(quantity<=0 || !item){
+      showErrorMessage("Add valid items");
+      setItem("");
+      setQuantity("");
+      return
+    }
+    if (item && quantity>0) {
       const existingItemIndex = itemsList.findIndex((el) => el.item === item);
       if (existingItemIndex !== -1) {
         // Item already exists, update quantity
@@ -107,10 +129,20 @@ const Dispose = () => {
         // Item doesn't exist, add new item
         setItemsList([...itemsList, { item, quantity: parseInt(quantity) }]);
       }
+      showToastMessage("Item added")
       setItem("");
       setQuantity("");
     }
   };
+
+  const del = (itemToDelete) => {
+    // Filter out the item to be deleted
+    const updatedItemsList = itemsList.filter((item) => item.item !== itemToDelete);
+    // Update the state with the filtered items list
+    setItemsList(updatedItemsList);
+    showToastMessage("Item deleted")
+  };
+  
 
   const deg2rad = (deg) => {
     return deg * (Math.PI / 180);
@@ -172,6 +204,7 @@ const Dispose = () => {
   return (
     <div>
       {isAuthenticated ? <AuthNavbar /> : <Navbar />}
+      <ToastContainer />
       <h1 className="flex justify-center text-4xl mb-6 mt-4">
         Dispose Your E-Waste
       </h1>
@@ -266,15 +299,21 @@ const Dispose = () => {
       <section className="text-gray-600 flex justify-center w-auto mb-5 body-font mt-10">
         <div className="flex flex-row w-1/2 justify-around items-start">
           <div>
-            <h2 className="text-xl font-bold mb-2">E-waste items:</h2>
+            <h2 className="text-center text-xl font-bold mb-2">E-waste items:</h2>
             {itemsList.length === 0 ? (
               <p className="mb-2 bg-[#b8deb4] rounded">‎ No items added</p>
             ) : (
               <ul>
                 {itemsList.map((item, index) => (
-                  <li key={index} className="mb-2 bg-[#b8deb4] rounded">
-                    {"‎ ‎ " + item.item} - {item.quantity}
+                  <div className="flex">
+                  <li key={index} className="mb-2 px-2 py-1 bg-[#b8deb4] rounded min-w-48">
+                   <p className="text-center">
+                   {item.item} - {item.quantity}
+                   </p> 
+                   {/* <button className="mb-2 bg-gray-300 rounded">Delete</button> */}
                   </li>
+                   <AiOutlineDelete onClick={() => del(item.item)}className=" ml-4 mt-1 rounded min-h-6 min-w-6"/>
+                  </div>
                 ))}
               </ul>
             )}

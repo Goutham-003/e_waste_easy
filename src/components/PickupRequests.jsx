@@ -4,12 +4,19 @@ import Sidenav from "./Sidenav";
 import AuthNavbar from "./DealerAuthNavbar";
 import { getToken, getUserName } from "./Cookies";
 import Accordion from "./Accordian";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const PickupRequests = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pickupRequests, setPickupRequests] = useState([]);
   const [allPickups, setAllPickups] = useState([]);
   const [dealerUserName, setDealerUserName] = useState();
+
+  const showToastMessage = (id) => {
+    toast.success("Accepted Request "+id+ "!", { autoClose: 3000 });
+  };
+
 
   const fetchPickupRequests = async () => {
     try {
@@ -58,7 +65,7 @@ export const PickupRequests = () => {
     }
   }, []);
 
-  const handleAcceptRequest = async (userName) => {
+  const handleAcceptRequest = async (userName,id) => {
     try {
       const dealerUserName = await getUserName();
       const dealer = dealerUserName.token;
@@ -69,6 +76,7 @@ export const PickupRequests = () => {
         }
       );
       if (response.ok) {
+        showToastMessage(id.slice(20));
         fetchPickupRequests();
         fetchAllPickups();
       } else {
@@ -95,6 +103,7 @@ export const PickupRequests = () => {
   return (
     <div>
       {isAuthenticated ? <AuthNavbar /> : <Navbar />}
+      <ToastContainer />
       <div className="flex ">
         <Sidenav />
         <div className="container mx-auto mt-8 space-between">
@@ -108,7 +117,7 @@ export const PickupRequests = () => {
               <div className="overflow-x-auto px-4">
                 <Accordion
                   data={pickupRequests.map((request) => ({
-                    title: `Request from user ${request.userName}`,
+                    title: `Request(\"${request._id.slice(20)}\") from user ${request.userName}`,
                     content: (
                       <div>
                         <table className="table-auto w-full">
@@ -143,7 +152,7 @@ export const PickupRequests = () => {
                           <button
                             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-center"
                             onClick={() =>
-                              handleAcceptRequest(request.userName)
+                              handleAcceptRequest(request.userName,request._id)
                             }
                           >
                             Accept
@@ -165,7 +174,7 @@ export const PickupRequests = () => {
             <div className="overflow-x-auto px-4">
               <Accordion
                 data={allPickups.map((pickup) => ({
-                  title: `Status of the request of user ${pickup.userName}`,
+                  title: `Status of the request(\"${pickup._id.slice(20)}\") of user ${pickup.userName}`,
                   content: (
                     <table className="table-auto w-full border-solid rounded-m border-gray-950">
                       <tbody>

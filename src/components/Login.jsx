@@ -14,6 +14,9 @@ export const Login = () => {
   const showToastMessage = () => {
     toast.success("Successfully Logged In !", { autoClose: 1600 });
   };
+  const showErrorMessage = () => {
+    toast.error("Invalid Username or Password !", { autoClose: 1600 });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -50,6 +53,7 @@ export const Login = () => {
       } else {
         // Handle login error
         console.error("Failed to login");
+        showErrorMessage();
       }
     } catch (error) {
       console.error("Error:", error);

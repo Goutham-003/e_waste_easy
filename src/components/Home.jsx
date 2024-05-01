@@ -18,7 +18,7 @@ const Home = () => {
     } else {
       setIsAuthenticated(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <>

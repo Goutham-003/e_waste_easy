@@ -4,11 +4,17 @@ import Sidenav from "./Sidenav";
 import AuthNavbar from "./DealerAuthNavbar";
 import { getToken, getUserName } from "./Cookies";
 import Accordion from "./Accordian";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const Extraction = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pickupRequests, setPickupRequests] = useState([]);
   const [dropRequests, setDropRequests] = useState([]);
+
+  const showToastMessage = (id) => {
+    toast.success("Ticket "+id+" Closed !", { autoClose: 3000 });
+  };
 
   const fetchPickupRequests = async () => {
     try {
@@ -57,7 +63,7 @@ export const Extraction = () => {
     }
   }, []);
 
-  const handleAcceptRequest = async (userName, itemsList) => {
+  const handleAcceptRequest = async (userName, itemsList, id) => {
     try {
       const dealerUserName = await getUserName();
       const dealer = dealerUserName.token;
@@ -79,6 +85,7 @@ export const Extraction = () => {
         }
       );
       if (response.ok) {
+        showToastMessage(id.slice(20));
         fetchPickupRequests();
         fetchDropRequests();
       } else {
@@ -89,17 +96,27 @@ export const Extraction = () => {
     }
   };
 
-  const handleDropAcceptRequest = async (userName) => {
+  const handleDropAcceptRequest = async (userName,itemsList,id) => {
     try {
       const dealerUserName = await getUserName();
       const dealer = dealerUserName.token;
+      const items = itemsList;
+      const disposedItems = items.reduce((acc, curr) => {
+        acc[curr.item] = curr.quantity;
+        return acc;
+      }, {});
       const response = await fetch(
         `http://localhost:5000/accept-drop-request-extraction/${dealer}/${userName}`,
         {
           method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(disposedItems),
         }
       );
       if (response.ok) {
+        showToastMessage(id.slice(20));
         fetchPickupRequests();
         fetchDropRequests();
       } else {
@@ -113,6 +130,7 @@ export const Extraction = () => {
   return (
     <div>
       {isAuthenticated ? <AuthNavbar /> : <Navbar />}
+      <ToastContainer />
       <div className="flex ">
         <Sidenav />
         <div className="container mx-auto mt-8 space-between">
@@ -126,7 +144,7 @@ export const Extraction = () => {
               <div className="overflow-x-auto px-4">
                 <Accordion
                   data={pickupRequests.map((request) => ({
-                    title: `Request from user ${request.userName}`,
+                    title: `Request(\"${request._id.slice(20)}\") from user ${request.userName}`,
                     content: (
                       <div>
                         <table className="table-auto w-full rounded-xl">
@@ -161,7 +179,7 @@ export const Extraction = () => {
                           <button
                             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-center"
                             onClick={() =>
-                              handleAcceptRequest(request.userName,request.itemsList)
+                              handleAcceptRequest(request.userName,request.itemsList,request._id)
                             }
                           >
                             Extracted
@@ -184,7 +202,7 @@ export const Extraction = () => {
               <div className="overflow-x-auto px-4">
                 <Accordion
                   data={dropRequests.map((request) => ({
-                    title: `Request from user ${request.userName}`,
+                    title: `Request(\"${request._id.slice(20)}\") from user ${request.userName}`,
                     content: (
                       <div>
                         <table className="table-auto w-full rounded-xl">
@@ -207,7 +225,7 @@ export const Extraction = () => {
                           <button
                             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-center"
                             onClick={() =>
-                              handleDropAcceptRequest(request.userName)
+                              handleDropAcceptRequest(request.userName,request.itemsList,request._id)
                             }
                           >
                             Extracted

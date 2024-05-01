@@ -4,12 +4,18 @@ import Sidenav from "./Sidenav";
 import AuthNavbar from "./DealerAuthNavbar";
 import { getToken, getUserName } from "./Cookies";
 import Accordion from "./Accordian"; // Import the Accordion component
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const DropRequests = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dropRequests, setDropRequests] = useState([]);
   const [allDrops, setAllDrops] = useState([]);
   const [dealerUserName, setDealerUserName] = useState();
+
+  const showToastMessage = (id) => {
+    toast.success("Accepted Request "+id+" !", { autoClose: 3000 });
+  };
 
   const fetchDropRequests = async () => {
     try {
@@ -56,7 +62,7 @@ export const DropRequests = () => {
     }
   }, []);
 
-  const handleAcceptRequest = async (userName) => {
+  const handleAcceptRequest = async (userName,id) => {
     try {
       const dealerUserName = await getUserName();
       const dealer = dealerUserName.token;
@@ -67,6 +73,7 @@ export const DropRequests = () => {
         }
       );
       if (response.ok) {
+        showToastMessage(id.slice(20));
         fetchDropRequests();
         fetchAllDrops();
       } else {
@@ -93,6 +100,7 @@ export const DropRequests = () => {
   return (
     <div>
       {isAuthenticated ? <AuthNavbar /> : <Navbar />}
+      <ToastContainer />
       <div className="flex ">
         <Sidenav />
         <div className="container mx-auto mt-8 space-between">
@@ -106,7 +114,7 @@ export const DropRequests = () => {
               <div className="overflow-x-auto px-4">
                 <Accordion
                   data={dropRequests.map((request) => ({
-                    title: "Request from user " + request.userName,
+                    title: `Request(\"${request._id.slice(20)}\") from user ` + request.userName,
                     content: (
                       <div>
                         <table className="table-auto w-full border border-slate-800">
@@ -131,7 +139,7 @@ export const DropRequests = () => {
                           <button
                             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-center"
                             onClick={() =>
-                              handleAcceptRequest(request.userName)
+                              handleAcceptRequest(request.userName,request._id)
                             }
                           >
                             Accept
@@ -153,7 +161,7 @@ export const DropRequests = () => {
             <div className="overflow-x-auto px-4">
               <Accordion
                 data={allDrops.map((drop) => ({
-                  title: "Status of the request of user " + drop.userName,
+                  title: `Status of the request(\"${drop._id.slice(20)}\") of user ` + drop.userName,
                   content: (
                     <table className="table-auto w-full border border-gray-800">
                       <tbody>

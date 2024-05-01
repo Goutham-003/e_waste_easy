@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
-import logo from "../logo.svg";
 import AuthNavbar from "./AuthNavbar";
 import "./login.css";
 import { getToken, getUserName } from "./Cookies";
@@ -27,7 +26,7 @@ export const UserProfile = () => {
   useEffect(() => {
     fetchStatus();
     console.log(statusData);
-  }, []);
+  }, [statusData]);
 
   const showToastMessage = (msg) => {
     toast.success("Successfully " + msg, { autoClose: 3000 });
@@ -115,13 +114,13 @@ export const UserProfile = () => {
         <div className="overflow-x-auto px-4 mx-72">
           <Accordion
             data={statusData.dropRequests.map((request) => ({
-              title: `Status of the drop request`,
+              title: `Status of the drop request("${request._id.slice(20)}")`,
               content: (
                 <div>
                   <div className="flex flex-col gap-10 h-max items-center">
                     <TrackingComponent
                       currentStepNumber={
-                        request.status === 3 ? 5 : request.status
+                        request.status === 3 ? 6 : request.status
                       }
                       type="drop"
                     />
@@ -132,13 +131,13 @@ export const UserProfile = () => {
           />
           <Accordion
             data={statusData.pickupRequests.map((request) => ({
-              title: `Status of the pickup request`,
+              title: `Status of the pickup request("${request._id.slice(20)}")`,
               content: (
                 <div>
                   <div className="flex flex-col gap-10 h-max items-center">
                     <TrackingComponent
                       currentStepNumber={
-                        request.status === 3 ? 5 : request.status
+                        request.status === 3 ? 6 : request.status
                       }
                       type="pickup"
                     />
@@ -188,7 +187,7 @@ export const UserProfile = () => {
                     htmlFor="password"
                     className="block text-m font-medium leading-6 text-gray-900"
                   >
-                    Password
+                    Current Password
                   </label>
                   <div className="mt-2 my-6">
                     <input
@@ -225,7 +224,7 @@ export const UserProfile = () => {
                     htmlFor="oldMobile"
                     className="block text-m font-medium leading-6 text-gray-900"
                   >
-                    Old Mobile Number
+                    Current Mobile Number
                   </label>
                   <div className="mt-2 my-6">
                     <input

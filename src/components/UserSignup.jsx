@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Navbar from "./Navbar";
 import logo from "../logo.svg";
 import "./login.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const UserSignup = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +16,13 @@ export const UserSignup = () => {
     address: "",
     postalCode: "",
   });
+
+  const showToastMessage = () => {
+    toast.success("Successfully Registered the User!", { autoClose: 1600 });
+  };
+  const showErrorMessage = (message) => {
+    toast.error( message, { autoClose: 1600 });
+  };
 
   const handleSubmit = async (e) => {
     console.log(JSON.stringify(formData));
@@ -31,10 +40,26 @@ export const UserSignup = () => {
       if (response.ok) {
         // Handle successful registration
         console.log("User registered successfully");
+        showToastMessage();
+        setFormData({
+          fullName: "",
+          userName: "",
+          phone: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          address: "",
+          postalCode: "",
+        });
       } else {
         // Handle registration error
         console.error("Failed to register user");
-      }
+        response.json().then(data => {
+          const errorMessage = data.error;
+          console.log(errorMessage); // Print the error message
+          showErrorMessage(errorMessage); // Show the error message
+        });
+      }      
     } catch (error) {
       console.error("Error:", error);
     }
@@ -47,6 +72,7 @@ export const UserSignup = () => {
   return (
     <div>
       <Navbar />
+      <ToastContainer/>
       <div className="signup-box">
         <div className="flex min-h-full flex-col justify-center px-6 py-4 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -72,6 +98,7 @@ export const UserSignup = () => {
                 <div className="mt-2">
                   <input
                     id="fullName"
+                    value={formData.fullName}
                     name="fullName"
                     type="name"
                     autoComplete="name"
@@ -92,6 +119,7 @@ export const UserSignup = () => {
                   <input
                     id="userName"
                     name="userName"
+                    value={formData.userName}
                     type="name"
                     autoComplete="name"
                     onChange={handleChange}
@@ -111,6 +139,7 @@ export const UserSignup = () => {
                   <input
                     id="phone"
                     name="phone"
+                    value={formData.phone}
                     type="phone"
                     autoComplete="tel"
                     onChange={handleChange}
@@ -130,6 +159,7 @@ export const UserSignup = () => {
                   <input
                     id="email"
                     name="email"
+                    value={formData.email}
                     type="email"
                     autoComplete="email"
                     onChange={handleChange}
@@ -152,6 +182,7 @@ export const UserSignup = () => {
                   <input
                     id="password"
                     name="password"
+                    value={formData.password}
                     type="password"
                     autocomplete="current-password"
                     onChange={handleChange}
@@ -171,8 +202,9 @@ export const UserSignup = () => {
                 </div>
                 <div class="mt-2">
                   <input
-                    id="cnf-password"
-                    name="cnf-password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
                     type="password"
                     autocomplete="current-password"
                     onChange={handleChange}
@@ -193,9 +225,11 @@ export const UserSignup = () => {
                   <input
                     type="text"
                     name="address"
+                    value={formData.address}
                     id="address"
                     autocomplete="street-address"
                     onChange={handleChange}
+                    required
                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   ></input>
                 </div>
@@ -212,8 +246,10 @@ export const UserSignup = () => {
                     type="text"
                     name="postalCode"
                     id="postalCode"
+                    value={formData.postalCode}
                     autocomplete="postal-code"
                     onChange={handleChange}
+                    required
                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   ></input>
                 </div>

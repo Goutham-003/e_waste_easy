@@ -22,7 +22,7 @@ export const Status = () => {
       {isAuthenticated ? <AuthNavbar /> : <Navbar />}
 
       <div className="flex flex-col gap-10 h-screen items-center">
-        <TrackingComponent currentStepNumber={3} type="drop" />
+        <TrackingComponent currentStepNumber={6} type="drop" />
       </div>
     </>
   );
